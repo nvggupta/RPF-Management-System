@@ -14,34 +14,28 @@ function PrivateRoute({children}) {
 
   if (isAuthenticated && 
     (location.pathname.includes("/user/login") || 
-     location.pathname.includes("/user/register"))) {
-    if (user?.role === "admin") {
-      return <Navigate to="/home/dashboard" />;
+     location.pathname.includes("/user/registration"))) {
+    if (user?.type === "admin") {
+      return <Navigate to="/admin/dashboard" />;
     } else {
-      return <Navigate to="/home" />;
+      return <Navigate to="/vendor" />;
     }
   }
 
-  if (location.pathname === "/Home/category") {
+  if (location.pathname === "/admin") {
     if (!isAuthenticated) {
       return <Navigate to="/user/login" />;
     } else {
-      if (user?.role === "admin") {
-        return <Navigate to="/home/dashboard" />;
+      if (user?.type === "admin") {
+        return <Navigate to="/admin/dashboard" />;
       }
     }
   }
-
-  if (isAuthenticated && 
-    user?.role !== "admin" && 
-    location.pathname.includes("/home/dashboard")) {
-    return <Navigate to="/unauthorized" />;
+  if(isAuthenticated && user?.type !== "admin" && location.pathname.includes("admin")){
+    return <Navigate to="/vendor/dashboard" />;
   }
-
-  if (isAuthenticated && 
-    user?.role === "admin" && 
-    location.pathname === "/home") {
-    return <Navigate to="/home/dashboard" />;
+  if(isAuthenticated && user?.type !=="vendor" && (location.pathname.includes("/Vendor/rfp-for-quotes") || location.pathname.includes("/Vendor/dashboard"))){
+    return <Navigate to="/admin/dashboard" />
   }
 
   return <>{children}</>;
@@ -67,7 +61,7 @@ export default PrivateRoute;
   //   if (user?.role === "admin") {
   //     return <Navigate to="/admin/dashboard" />;
   //   } else {
-  //     return <Navigate to="/shop/home" />;
+  //     return <Navigate to="/shop/admin" />;
   //   }
   // }
 

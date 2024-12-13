@@ -10,6 +10,8 @@ import Dashboard from "./Components/Dashboard";
 import Category from "./Components/Admin/Category";
 import Vendor from "./Components/Admin/Vendor";
 import PrivateRoute from "./Components/PrivateRoute/PrivateRoute";
+import RFP from "./Components/Admin/RFP";
+import RFPForQuotes from "./Components/Vendors/RFPForQuotes";
 
 const router = createBrowserRouter([
   {
@@ -20,9 +22,39 @@ const router = createBrowserRouter([
         path: "admin",
         element: <Home />,
         children: [
-          { path: "dashboard", element: <PrivateRoute><Dashboard></Dashboard></PrivateRoute> },
-          { path: "category", element: <PrivateRoute><Category  /></PrivateRoute>},
-          { path: "vendor", element: <PrivateRoute><Vendor></Vendor></PrivateRoute> },        ],
+          {
+            path: "dashboard",
+            element: (
+              <PrivateRoute>
+                <Dashboard></Dashboard>
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "category",
+            element: (
+              <PrivateRoute>
+                <Category />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "vendor",
+            element: (
+              <PrivateRoute>
+                <Vendor />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "RFP",
+            element: (
+              <PrivateRoute>
+                <RFP />
+              </PrivateRoute>
+            ),
+          },
+        ],
       },
       {
         path: "user",
@@ -31,11 +63,48 @@ const router = createBrowserRouter([
           {
             path: "registration",
             children: [
-              { path: "vendor-registration", element: <PrivateRoute><VendorRegistration /></PrivateRoute> },
-              { path: "admin-registration", element: <PrivateRoute><AdminRegistration /></PrivateRoute> },
-            ],          },
+              {
+                path: "vendor-registration",
+                element: (
+                  <PrivateRoute>
+                    <VendorRegistration />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: "admin-registration",
+                element: (
+                  <PrivateRoute>
+                    <AdminRegistration />
+                  </PrivateRoute>
+                ),
+              },
+            ],
+          },
           { path: "reset-password", element: <ResetPasswordAuthentication /> },
           { path: "forget-password", element: <ForgetPassword /> },
+        ],
+      },
+      {
+        path: "vendor",
+        element: <Home />,
+        children: [
+          {
+            path: "dashboard",
+            element: (
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: "rfp-for-quotes",
+            element: (
+              <PrivateRoute>
+                <RFPForQuotes />
+              </PrivateRoute>
+            ),
+          },
         ],
       },
     ],
@@ -44,7 +113,7 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <> 
+    <>
       <RouterProvider router={router} />;
     </>
   );

@@ -43,17 +43,18 @@ function Sidebar({ userType = "admin" }) {
                   Vendor
                 </li>
               </Link>
-
-              <li
-                className={`px-4 py-2 rounded cursor-pointer ${
-                  activeItem === 2
-                    ? "bg-gray-700 text-red-500"
-                    : "hover:bg-gray-700"
-                }`}
-                onClick={() => handleItemClick(2)}
-              >
-                RFP List
-              </li>
+              <Link to={"/admin/RFP"}>
+                <li
+                  className={`px-4 py-2 rounded cursor-pointer ${
+                    activeItem === 2
+                      ? "bg-gray-700 text-red-500"
+                      : "hover:bg-gray-700"
+                  }`}
+                  onClick={() => handleItemClick(2)}
+                >
+                  RFP List
+                </li>
+              </Link>
               <Link to={"/admin/category"}>
                 <li
                   className={`px-4 py-2 rounded cursor-pointer ${
