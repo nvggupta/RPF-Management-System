@@ -8,12 +8,14 @@ function Category() {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [editInd, setEditInd] = useState(null);
+  const [changedCategory, setChangedCategory] = useState();
+  const [userInfo, setUserInfo] = useState(JSON.parse(localStorage.getItem("userInfo")));
   const itemsPerPage = 5;
 
   const getCategoryList = async () => {
     try {
       setLoading(true);
-      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      
       const response = await axios.get(
         "https://rfpdemo.velsof.com/api/categories",
         {
@@ -45,7 +47,6 @@ function Category() {
   };
   const handleDelete = async (id) => {
     try {
-      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
       const response = await axios.delete(
         `https://rfpdemo.velsof.com/api/categories/delete/${id}`,
         {
@@ -61,98 +62,143 @@ function Category() {
       console.error(error);
     }
   };
+  const handleEditCategory = async()=>{
+    try {
+      const response = await axios.put(`https://rfpdemo.velsof.com/api/categories/${editInd}`,{
+        name:changedCategory,
+        _methhod: "PUT",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userInfo?.token}`,
+        },
+      }
+    )
+    console.log(response.data);
+    toast.success("Category Updated Successfully");
+    getCategoryList();
+    setEditInd(null);
+    setChangedCategory("");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error Updating Category");
+      
+    }
+  }
   return (
-    <>
-      {editInd === null ? 
-      (<div className="container mx-auto p-4">
-        <ToastContainer />
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold mb-4 text-center">Category List</h1>
-          <button className="px-2 py-3 rounded-md bg-green-500 text-white hover:bg-green-400">
-            Add Category
-          </button>
-        </div>
-        {loading ? (
-          <p className="text-center">Loading...</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full table-auto border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-200 text-left">
-                  <th className="border border-gray-300 px-4 py-2">S.No</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Category_Name
-                  </th>
-                  <th className="border border-gray-300 px-4 py-2">Status</th>
-                  <th className="border border-gray-300 px-4 py-2">Actions</th>
-                  <th className="border border-gray-300 px-4 py-2">
-                    Edit/Delete
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.map((item, index) => (
-                  <tr key={item.id} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 px-4 py-2">
-                      {first + index + 1}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      {item.name}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2">
-                      <span
-                        className={`px-2 py-1 text-white rounded ${
-                          item.status ? "bg-green-500" : "bg-red-500"
+    <div>
+      {editInd === null ? (
+        <div className="container mx-auto p-4">
+          <ToastContainer />
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold mb-4 text-center">
+              Category List
+            </h1>
+            <button className="px-2 py-3 rounded-md bg-green-500 text-white hover:bg-green-400">
+              Add Category
+            </button>
+          </div>
+          {loading ? (
+            <p className="text-center">Loading...</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full table-auto border-collapse border border-gray-300">
+                <thead>
+                  <tr className="bg-gray-200 text-left">
+                    <th className="border border-gray-300 px-4 py-2">S.No</th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Category_Name
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">Status</th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Actions
+                    </th>
+                    <th className="border border-gray-300 px-4 py-2">
+                      Edit/Delete
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((item, index) => (
+                    <tr key={item.id} className="hover:bg-gray-100">
+                      <td className="border border-gray-300 px-4 py-2">
+                        {first + index + 1}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {item.name}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        <span
+                          className={`px-2 py-1 text-white rounded ${
+                            item.status ? "bg-green-500" : "bg-red-500"
+                          }`}
+                        >
+                          {item.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td
+                        className={`border border-gray-300 px-4 cursor-pointer py-2 ${
+                          item.status === "Active"
+                            ? "text-red-400"
+                            : "text-green-400"
                         }`}
                       >
-                        {item.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td
-                      className={`border border-gray-300 px-4 cursor-pointer py-2 ${
-                        item.status === "Active"
-                          ? "text-red-400"
-                          : "text-green-400"
-                      }`}
-                    >
-                      {item.status === "Active" ? "Deactivate" : "Activate"}
-                    </td>
-                    <td className="border border-gray-300 px-4 py-2 space-x-2">
-                      <button className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded">
-                        Edit
-                      </button>
-                      <button
-                        className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+                        {item.status === "Active" ? "Deactivate" : "Activate"}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2 space-x-2">
+                        <button
+                          className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded"
+                          onClick={() => {setEditInd(item.id) , setChangedCategory(item.name)}}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded"
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="mt-4 flex justify-center">
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={`px-3 py-1 mx-1 rounded ${
+                      currentPage === index + 1
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-300"
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
                 ))}
-              </tbody>
-            </table>
-            <div className="mt-4 flex justify-center">
-              {Array.from({ length: totalPages }, (_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handlePageChange(index + 1)}
-                  className={`px-3 py-1 mx-1 rounded ${
-                    currentPage === index + 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-300"
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>) :  (<div className="container mx-auto p-4">hello</div>)
-      }
-      
-    </>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-col sm:flex-row gap-4 p-4">
+          <input
+            type="text"
+            value={changedCategory}
+            placeholder="Enter New Category Name"
+            className="w-full sm:w-2/3 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+            onChange={(e) => setChangedCategory(e.target.value)}
+          />
+          <button
+            className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+            onClick={() => handleEditCategory()}
+          >
+            Change Category
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 

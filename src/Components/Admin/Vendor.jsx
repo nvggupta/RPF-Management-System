@@ -114,10 +114,10 @@ function Vendor() {
                     </td>
                   }
                   <td
-                    className="border border-gray-300 text-red-500 p-2 cursor-pointer"
+                    className={`border border-gray-300 text-red-500 p-2 cursor-pointer ${vendorItem.status === "Approved" ? "cursor-not-allowed" : ""}`}
                     onClick={() => handleApproveVendor(vendorItem.user_id)}
                   >
-                    {vendorItem.status !== "Approved" && "Approve"}
+                    {vendorItem.status !== "Approved" ? "Approve" : "You Are A Vendor"}
                   </td>
                 </tr>
               ))}
