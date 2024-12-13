@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 function Vendor() {
@@ -42,37 +42,34 @@ function Vendor() {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-  const handleApproveVendor = async(id) => {
-    console.log(id)
+  const handleApproveVendor = async (id) => {
+    console.log(id);
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     try {
-        const response = await axios.post("https://rfpdemo.velsof.com/api/approveVendor",
-            {
-                user_id: id,
-                status: "Approved",
-                _method : "PUT"
-            },
-            {
-
-                headers:{
-                    Authorization: `Bearer ${userInfo?.token}`,
-                }
-            }
-        
-    )
-    toast.success("Vendor approved successfully");
-    getVendorList();
-    
-        
+      const response = await axios.post(
+        "https://rfpdemo.velsof.com/api/approveVendor",
+        {
+          user_id: id,
+          status: "Approved",
+          _method: "PUT",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo?.token}`,
+          },
+        }
+      );
+      console.log(response.data)
+      toast.success("Vendor approved successfully");
+      getVendorList();
     } catch (error) {
-        toast.error("Error approving vendor");
-        console.log(error);
+      toast.error("Error approving vendor");
+      console.log(error);
     }
-    
   };
   return (
     <div className="p-4 ">
-    <ToastContainer />
+      <ToastContainer />
       <h1 className="text-2xl font-bold mb-4">Vendor List</h1>
       {loading ? (
         <p className="text-blue-500">Loading...</p>
@@ -92,7 +89,10 @@ function Vendor() {
             </thead>
             <tbody>
               {currentItems.map((vendorItem) => (
-                <tr key={vendorItem.id} className="text-center hover:bg-gray-100">
+                <tr
+                  key={vendorItem.id}
+                  className="text-center hover:bg-gray-100"
+                >
                   <td className="border border-gray-300 p-2">
                     {vendorItem.user_id}
                   </td>
@@ -109,15 +109,27 @@ function Vendor() {
                     {vendorItem.mobile}
                   </td>
                   {
-                    <td className={`border border-gray-300 p-2 ${vendorItem.status === "Approved" ? "text-green-500" : "text-red-500"}`}>
+                    <td
+                      className={`border border-gray-300 p-2 ${
+                        vendorItem.status === "Approved"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    >
                       {vendorItem.status}
                     </td>
                   }
                   <td
-                    className={`border border-gray-300 text-red-500 p-2 cursor-pointer ${vendorItem.status === "Approved" ? "cursor-not-allowed" : ""}`}
+                    className={`border border-gray-300 text-red-500 p-2 cursor-pointer ${
+                      vendorItem.status === "Approved"
+                        ? "cursor-not-allowed"
+                        : ""
+                    }`}
                     onClick={() => handleApproveVendor(vendorItem.user_id)}
                   >
-                    {vendorItem.status !== "Approved" ? "Approve" : "You Are A Vendor"}
+                    {vendorItem.status !== "Approved"
+                      ? "Approve"
+                      : "You Are A Vendor"}
                   </td>
                 </tr>
               ))}

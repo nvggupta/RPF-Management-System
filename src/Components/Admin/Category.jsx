@@ -9,7 +9,7 @@ function Category() {
   const [currentPage, setCurrentPage] = useState(1);
   const [editInd, setEditInd] = useState(null);
   const [changedCategory, setChangedCategory] = useState();
-  const [userInfo, setUserInfo] = useState(JSON.parse(localStorage.getItem("userInfo")));
+  const [userInfo, ] = useState(JSON.parse(localStorage.getItem("userInfo")));
   const itemsPerPage = 5;
 
   const getCategoryList = async () => {

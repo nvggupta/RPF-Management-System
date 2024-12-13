@@ -1,17 +1,21 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, current } from "@reduxjs/toolkit";
 
 const initialState = {
   rpf: [],
 };
 
-const rpfSlice = createSlice({
+export const rpfSlice = createSlice({
     name: "rpf",
     initialState,
     reducers: {
-        setRpf: (state, action) => {
-            state.rpf = action.payload;
+        setUser : (state, action) => {
+            state.rpf = action.payload; 
+            console.log(action.payload);
         },
-    },
+        removeUser : (state) => {
+            state.rpf = [];
+        }
+    }
 });
-export const { setRpf } = rpfSlice.actions;
+export const { setUser , removeUser } = rpfSlice.actions;
 export default rpfSlice.reducer;

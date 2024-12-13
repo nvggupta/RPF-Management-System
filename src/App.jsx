@@ -9,7 +9,7 @@ import MainLayout from "./Components/Layout/MainLayout";
 import Dashboard from "./Components/Dashboard";
 import Category from "./Components/Admin/Category";
 import Vendor from "./Components/Admin/Vendor";
-// import PrivateRoute from "./Components/PrivateRoute/PrivateRoute";
+import PrivateRoute from "./Components/PrivateRoute/PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -17,13 +17,12 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       {
-        path: "home",
+        path: "admin",
         element: <Home />,
         children: [
-          { path: "", element: <Dashboard></Dashboard> },
-          { path: "category", element: <Category></Category> },
-          { path: "vendor", element: <Vendor></Vendor> },
-        ],
+          { path: "dashboard", element: <PrivateRoute><Dashboard></Dashboard></PrivateRoute> },
+          { path: "category", element: <PrivateRoute><Category  /></PrivateRoute>},
+          { path: "vendor", element: <PrivateRoute><Vendor></Vendor></PrivateRoute> },        ],
       },
       {
         path: "user",
@@ -32,10 +31,9 @@ const router = createBrowserRouter([
           {
             path: "registration",
             children: [
-              { path: "vendor-registration", element: <VendorRegistration /> },
-              { path: "admin-registration", element: <AdminRegistration /> },
-            ],
-          },
+              { path: "vendor-registration", element: <PrivateRoute><VendorRegistration /></PrivateRoute> },
+              { path: "admin-registration", element: <PrivateRoute><AdminRegistration /></PrivateRoute> },
+            ],          },
           { path: "reset-password", element: <ResetPasswordAuthentication /> },
           { path: "forget-password", element: <ForgetPassword /> },
         ],

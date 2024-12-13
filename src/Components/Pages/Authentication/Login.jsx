@@ -26,14 +26,12 @@ function Login() {
       if (response.data.response === "success") {
         toast.success(response?.data?.response + "fully" + " Login");
         setUserData(response.data);
-        console.log(userData);
-        navigate("/");
+        navigate("/admin/dashboard");
       } else {
         toast.error(response?.data?.error);
       }
       setIsLoading(false);
-      console.log(formData);
-      console.log(response.data);
+   
     } catch (error) {
       toast.error(error.message);
       setIsLoading(false);

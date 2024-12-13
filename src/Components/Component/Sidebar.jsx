@@ -17,7 +17,7 @@ function Sidebar({ userType = "admin" }) {
         />
 
         <ul className="space-y-4">
-          <Link to={"/home"}>
+          <Link to={"/admin/dashboard"}>
             <li
               className={`px-4 py-2 rounded cursor-pointer ${
                 activeItem === 0
@@ -31,7 +31,7 @@ function Sidebar({ userType = "admin" }) {
           </Link>
           {userType === "admin" && (
             <>
-              <Link to={"/home/vendor"}>
+              <Link to={"/admin/vendor"}>
                 <li
                   className={`px-4 py-2 rounded cursor-pointer ${
                     activeItem === 1
@@ -52,9 +52,9 @@ function Sidebar({ userType = "admin" }) {
                 }`}
                 onClick={() => handleItemClick(2)}
               >
-                RPF List
+                RFP List
               </li>
-              <Link to={"/home/category"}>
+              <Link to={"/admin/category"}>
                 <li
                   className={`px-4 py-2 rounded cursor-pointer ${
                     activeItem === 3
@@ -76,7 +76,7 @@ function Sidebar({ userType = "admin" }) {
             }`}
             onClick={() => handleItemClick(4)}
           >
-            RPF Quotes
+            RFP Quotes
           </li>
         </ul>
       </div>
