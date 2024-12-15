@@ -2,12 +2,13 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import ApplyForQuotes from "./ApplyForQuotes";
 function RFPForQuotes() {
   const [userInfo, setUserInfo] = useState(
     JSON.parse(localStorage.getItem("userInfo"))
   );
   const [quotesData, setQuotesData] = useState([]);
+  const [selectedQuote, setSelectedQuote] = useState(null);
 
   const getAdminQuotes = async () => {
     try {
@@ -41,80 +42,87 @@ function RFPForQuotes() {
     <div className="p-6">
       <ToastContainer />
       <h1 className="text-2xl font-bold mb-4">Request for Proposals (RFPs)</h1>
-
-      <div className="overflow-x-auto">
-        <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="border border-gray-300 px-4 py-2 text-left">
-                RFP No
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
-                RFP Title
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
-                Last Date
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
-                Min Amount
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
-                Max Amount
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
-                Status
-              </th>
-              <th className="border border-gray-300 px-4 py-2 text-left">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {quotesData && quotesData.length > 0 ? (
-              quotesData?.map((quote, index) => (
-                <tr key={index} className="hover:bg-gray-100">
-                  <td className="border border-gray-300 px-4 py-2">
-                    {quote.rfp_no}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {quote.item_name}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {quote.last_date}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {quote.minimum_price}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {quote.maximum_price}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {quote.status}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {isDateValid(quote.last_date) && quote.status === "open" ? (
-                      <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                        Apply
-                      </button>
-                    ) : (
-                      <span className="text-red-500">Closed</span>
-                    )}
+      {selectedQuote === null ? (
+        <div className="overflow-x-auto">
+          <table className="table-auto w-full border-collapse border border-gray-300">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  RFP No
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  RFP Title
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Last Date
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Min Amount
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Max Amount
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Status
+                </th>
+                <th className="border border-gray-300 px-4 py-2 text-left">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {quotesData && quotesData.length > 0 ? (
+                quotesData?.map((quote, index) => (
+                  <tr key={index} className="hover:bg-gray-100">
+                    <td className="border border-gray-300 px-4 py-2">
+                      {quote.rfp_no}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {quote.item_name}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {quote.last_date}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {quote.minimum_price}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {quote.maximum_price}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {quote.status}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {isDateValid(quote.last_date) &&
+                      quote.status === "open" ? (
+                        <button
+                          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                          onClick={() => setSelectedQuote(quotesData.rfp_id)}
+                        >
+                          Apply
+                        </button>
+                      ) : (
+                        <span className="text-red-500">Closed</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="7"
+                    className="text-center border border-gray-300 px-4 py-2"
+                  >
+                    No data available
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="7"
-                  className="text-center border border-gray-300 px-4 py-2"
-                >
-                  No data available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <ApplyForQuotes selectedQuote={selectedQuote} setSelectedQuote={setSelectedQuote} />
+      )}
     </div>
   );
 }

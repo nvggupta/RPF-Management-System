@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+
 function Sidebar() {
   const [activeItem, setActiveItem] = useState(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  const userType = userInfo.type;
+  const userType = userInfo?.type;
   const handleItemClick = (index) => {
     setActiveItem(index);
   };
