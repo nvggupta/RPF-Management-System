@@ -1,21 +1,27 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import { setCategory } from "../Features/RPFslice";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch } from "react-redux";
 
 function Category() {
-  const [category, setCategory] = useState([]);
+  const [category, setLocalCategory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [editInd, setEditInd] = useState(null);
   const [changedCategory, setChangedCategory] = useState();
-  const [userInfo, ] = useState(JSON.parse(localStorage.getItem("userInfo")));
-  const itemsPerPage = 5;
+  const [userInfo] = useState(JSON.parse(localStorage.getItem("userInfo")));
+  const [addCategory, setAddCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [searchCategory, setSearchCategory] = useState("");
+  const itemsPerPage = 10;
+  const dispatch = useDispatch();
 
   const getCategoryList = async () => {
     try {
       setLoading(true);
-      
+
       const response = await axios.get(
         "https://rfpdemo.velsof.com/api/categories",
         {
@@ -25,7 +31,8 @@ function Category() {
         }
       );
       console.log(response.data);
-      setCategory(Object.values(response?.data?.categories) || []);
+      setLocalCategory(Object.values(response?.data?.categories) || []);
+      dispatch(setCategory(Object.values(response?.data?.categories) || []));
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -62,41 +69,128 @@ function Category() {
       console.error(error);
     }
   };
-  const handleEditCategory = async()=>{
+  const handleEditCategory = async () => {
     try {
-      const response = await axios.put(`https://rfpdemo.velsof.com/api/categories/${editInd}`,{
-        name:changedCategory,
-        _methhod: "PUT",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${userInfo?.token}`,
+      const response = await axios.put(
+        `https://rfpdemo.velsof.com/api/categories/${editInd}`,
+        {
+          name: changedCategory,
+          _methhod: "PUT",
         },
-      }
-    )
-    console.log(response.data);
-    toast.success("Category Updated Successfully");
-    getCategoryList();
-    setEditInd(null);
-    setChangedCategory("");
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo?.token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      toast.success("Category Updated Successfully");
+      getCategoryList();
+      setEditInd(null);
+      setChangedCategory("");
     } catch (error) {
       console.error(error);
       toast.error("Error Updating Category");
-      
+    }
+  };
+  const handleAddCategory = async () => {
+    try {
+      const response = await axios.post(
+        "https://rfpdemo.velsof.com/api/categories",
+        {
+          name: newCategory,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo?.token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      if (response.data.response === "success") {
+        toast.success(response.data.response);
+        getCategoryList();
+      } else {
+        toast.error(response.data.errors);
+      }
+      setAddCategory(false);
+    } catch (error) {
+      console.log("Error Occured In Add Category");
+      toast.error(error);
+    }
+  };
+  const handleSearch = async()=>{
+    const findElem = category?.find(elem=>elem?.name === searchCategory);
+    console.log(findElem)
+    try {
+       const response = await axios.get(`https://rfpdemo.velsof.com/api/categories/${findElem.id}`,{
+        
+          headers:{
+            Authorization : userInfo?.token,
+          }
+        
+       });
+       console.log(response);
+    } catch (error) {
+      console.log(error);
     }
   }
+  // Add Category
+  if (addCategory) {
+    return (
+      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <input
+            type="text"
+            placeholder="Enter Category Name"
+            onChange={(e) => setNewCategory(e.target.value)}
+            className="border border-gray-300 rounded-md px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={handleAddCategory}
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            >
+              Submit
+            </button>
+            <button
+              onClick={() => setAddCategory(false)}
+              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // List Of All Category
   return (
     <div>
       {editInd === null ? (
         <div className="container mx-auto p-4">
           <ToastContainer />
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold mb-4 text-center">
-              Category List
-            </h1>
-            <button className="px-2 py-3 rounded-md bg-green-500 text-white hover:bg-green-400">
-              Add Category
-            </button>
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+            <h1 className="text-2xl font-bold text-center">Category List</h1>
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+              <div className="flex w-full sm:w-auto">
+                <input
+                  type="text"
+                  placeholder="Search categories..."
+                  onChange={(e)=>setSearchCategory(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                />
+                <button className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600" onClick={handleSearch}>
+                  Search
+                </button>
+              </div>
+              <button
+                className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-400 w-full sm:w-auto"
+                onClick={() => setAddCategory(true)}
+              >
+                Add Category
+              </button>
+            </div>
           </div>
           {loading ? (
             <p className="text-center">Loading...</p>
@@ -145,20 +239,25 @@ function Category() {
                       >
                         {item.status === "Active" ? "Deactivate" : "Activate"}
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 space-x-2">
-                        <button
-                          className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded"
-                          onClick={() => {setEditInd(item.id) , setChangedCategory(item.name)}}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded"
-                          onClick={() => handleDelete(item.id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <button
+                            className="w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded"
+                            onClick={() => {
+                              setEditInd(item.id),
+                                setChangedCategory(item.name);
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="w-full sm:w-auto bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>{" "}
                     </tr>
                   ))}
                 </tbody>

@@ -12,6 +12,7 @@ import Vendor from "./Components/Admin/Vendor";
 import PrivateRoute from "./Components/PrivateRoute/PrivateRoute";
 import RFP from "./Components/Admin/RFP";
 import RFPForQuotes from "./Components/Vendors/RFPForQuotes";
+import RFPQuotes from "./Components/Admin/RFPQuotes";
 
 const router = createBrowserRouter([
   {
@@ -47,13 +48,21 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: "RFP",
+            path: "rfp",
             element: (
               <PrivateRoute>
                 <RFP />
               </PrivateRoute>
             ),
           },
+          {
+            path: "rfp-for-quotes",
+            element: (
+              <PrivateRoute>
+                <RFPQuotes />
+              </PrivateRoute>
+            ),
+          }
         ],
       },
       {

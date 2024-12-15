@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 function VendorRegistration() {
   const [isLoading, setIsLoading] = useState(false);
   const [categoryData, setCategoryData] = useState([]);
@@ -25,6 +26,7 @@ function VendorRegistration() {
       console.log("Response from API:", response.data);
       if (response.data.response === "success") {
         toast.success(response.data.response);
+        <Navigate to={"/vendor/dashboard"} />
       } else {
         toast.error(response.data.error[0]);
       }
@@ -291,6 +293,7 @@ function VendorRegistration() {
             </div>
 
             <button
+             
               type="submit"
               className="col-span-2 self-start justify-self-start py-3 px-6 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
             >

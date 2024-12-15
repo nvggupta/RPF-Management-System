@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-function Sidebar({ userType = "admin" }) {
+function Sidebar() {
   const [activeItem, setActiveItem] = useState(null);
-  const navigate = useNavigate();
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userType = userInfo.type;
   const handleItemClick = (index) => {
     setActiveItem(index);
   };
@@ -67,18 +68,34 @@ function Sidebar({ userType = "admin" }) {
                   Category
                 </li>
               </Link>
+              <Link to={"/admin/rfp-for-quotes"}>
+                <li
+                  className={`px-4 py-2 rounded cursor-pointer ${
+                    activeItem === 4
+                      ? "bg-gray-700 text-red-500"
+                      : "hover:bg-gray-700"
+                  }`}
+                  onClick={() => handleItemClick(4)}
+                >
+                  RFP Quotess
+                </li>
+              </Link>
             </>
           )}
-          <li
-            className={`px-4 py-2 rounded cursor-pointer ${
-              activeItem === 4
-                ? "bg-gray-700 text-red-500"
-                : "hover:bg-gray-700"
-            }`}
-            onClick={() => handleItemClick(4)}
-          >
-            RFP Quotes
-          </li>
+          {userType === "vendor" && (
+            <Link to={"/vendor/rfp-for-quotes"}>
+              <li
+                className={`px-4 py-2 rounded cursor-pointer ${
+                  activeItem === 4
+                    ? "bg-gray-700 text-red-500"
+                    : "hover:bg-gray-700"
+                }`}
+                onClick={() => handleItemClick(4)}
+              >
+                RFP Quotes
+              </li>
+            </Link>
+          )}
         </ul>
       </div>
     </div>

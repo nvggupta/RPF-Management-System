@@ -1,21 +1,32 @@
 import { createSlice, current } from "@reduxjs/toolkit";
+import SelectCategory from "../Admin/SelectCategory";
 
 const initialState = {
-  rpf: [],
+  rpf: {
+    vendors : [],
+    category : [],
+    SelectedCategory : ""
+  },
 };
 
 export const rpfSlice = createSlice({
     name: "rpf",
     initialState,
     reducers: {
-        setUser : (state, action) => {
-            state.rpf = action.payload; 
-            console.log(action.payload);
+        setVendors: (state, action) => {
+            state.rpf.vendors = action.payload;
         },
-        removeUser : (state) => {
-            state.rpf = [];
-        }
+        setCategory: (state, action) => {
+            console.log(action.payload);
+            state.rpf.category = action.payload;
+            console.log(current(state));
+        },
+        categorySelectByAdmin : (state , action)=>{
+            state.rpf.setCategory = action.payload;
+        },
+        
+
     }
 });
-export const { setUser , removeUser } = rpfSlice.actions;
+export const { setVendors, setCategory } = rpfSlice.actions;
 export default rpfSlice.reducer;

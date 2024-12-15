@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import { setVendors } from "../Features/RPFslice";
+import { useDispatch } from "react-redux";
 function Vendor() {
+  const dispatch = useDispatch();
   const [vendor, setVendor] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
 
   const getVendorList = async () => {
     try {
@@ -21,6 +24,7 @@ function Vendor() {
       );
       console.log(response.data);
       setVendor(response.data.vendors || []);
+      dispatch(setVendors(response.data.vendors || []));
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -33,7 +37,6 @@ function Vendor() {
     console.log("Hello");
     console.log("Vendor List", vendor);
   }, []);
-
   const last = currentPage * itemsPerPage;
   const first = last - itemsPerPage;
   const currentItems = vendor.slice(first, last);

@@ -8,7 +8,7 @@ function PrivateRoute({children}) {
 
   if (!isAuthenticated && 
     !(location.pathname.includes("/user/login") || 
-      location.pathname.includes("/user/register"))) {
+      location.pathname.includes("/user/registration"))) {
     return <Navigate to="/user/login" />;
   }
 
