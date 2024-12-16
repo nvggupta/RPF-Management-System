@@ -13,6 +13,7 @@ import PrivateRoute from "./Components/PrivateRoute/PrivateRoute";
 import RFP from "./Components/Admin/RFP";
 import RFPForQuotes from "./Components/Vendors/RFPForQuotes";
 import RFPQuotes from "./Components/Admin/RFPQuotes";
+import PageNotFound from "./Components/PageNotFound";
 
 const router = createBrowserRouter([
   {
@@ -116,10 +117,13 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "*",
+        element: <PageNotFound />
+      },
     ],
   },
 ]);
-
 function App() {
   return (
     <>

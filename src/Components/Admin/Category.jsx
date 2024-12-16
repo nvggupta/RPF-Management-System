@@ -15,6 +15,7 @@ function Category() {
   const [addCategory, setAddCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [searchCategory, setSearchCategory] = useState("");
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const itemsPerPage = 10;
   const dispatch = useDispatch();
 
@@ -32,6 +33,7 @@ function Category() {
       );
       console.log(response.data);
       setLocalCategory(Object.values(response?.data?.categories) || []);
+      setFilteredCategories(Object.values(response?.data?.categories) || []);
       dispatch(setCategory(Object.values(response?.data?.categories) || []));
       setLoading(false);
     } catch (error) {
@@ -42,12 +44,24 @@ function Category() {
   useEffect(() => {
     getCategoryList();
   }, []);
+
+  useEffect(() => {
+    if (searchCategory) {
+      const filtered = category.filter(cat => 
+        cat.name.toLowerCase().includes(searchCategory.toLowerCase())
+      );
+      setFilteredCategories(filtered);
+      setCurrentPage(1);
+    } else {
+      setFilteredCategories(category);
+    }
+  }, [searchCategory, category]);
+
   const last = currentPage * itemsPerPage;
   const first = last - itemsPerPage;
 
-  const currentItems = category?.slice(first, last);
-  //   const currentItems = [1,2,3,4,5,6]
-  const totalPages = Math.ceil(category.length / itemsPerPage);
+  const currentItems = filteredCategories?.slice(first, last);
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -119,22 +133,7 @@ function Category() {
       toast.error(error);
     }
   };
-  const handleSearch = async()=>{
-    const findElem = category?.find(elem=>elem?.name === searchCategory);
-    console.log(findElem)
-    try {
-       const response = await axios.get(`https://rfpdemo.velsof.com/api/categories/${findElem.id}`,{
-        
-          headers:{
-            Authorization : userInfo?.token,
-          }
-        
-       });
-       console.log(response);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+
   // Add Category
   if (addCategory) {
     return (
@@ -177,12 +176,10 @@ function Category() {
                 <input
                   type="text"
                   placeholder="Search categories..."
-                  onChange={(e)=>setSearchCategory(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                  value={searchCategory}
+                  onChange={(e) => setSearchCategory(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                 />
-                <button className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600" onClick={handleSearch}>
-                  Search
-                </button>
               </div>
               <button
                 className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-400 w-full sm:w-auto"
