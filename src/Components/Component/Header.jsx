@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 function Header() {
-  const [userData, setUserData] = useState();
+  const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -9,8 +9,9 @@ function Header() {
     if (userInfo) {
       setIsLoggedIn(true);
       setUserData(JSON.parse(userInfo));
+      
     }
-  }, []);
+  },[]);
 
   const handleLogout = () => {
     localStorage.removeItem("userInfo");

@@ -8,6 +8,7 @@ function Vendor() {
   const [vendor, setVendor] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [approveLoading, setAppproveLoading] = useState({});
   const itemsPerPage = 10;
 
   const getVendorList = async () => {
@@ -50,6 +51,7 @@ function Vendor() {
     console.log(id);
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     try {
+      setAppproveLoading(prev => ({...prev, [id]: true}));
       const response = await axios.post(
         "https://rfpdemo.velsof.com/api/approveVendor",
         {
@@ -65,10 +67,12 @@ function Vendor() {
       );
       console.log(response.data)
       toast.success("Vendor approved successfully");
+      setAppproveLoading(prev => ({...prev, [id]: false}));
       getVendorList();
     } catch (error) {
       toast.error("Error approving vendor");
       console.log(error);
+      setAppproveLoading(prev => ({...prev, [id]: false}));
     }
   };
   return (
@@ -132,11 +136,12 @@ function Vendor() {
                       onClick={() => handleApproveVendor(vendorItem.user_id)}
                     >
                       {vendorItem.status !== "Approved"
-                        ? "Approve"
-                        : "You Are A Vendor"}
+                      ? approveLoading[vendorItem.user_id]
+                        ? "Loading..."
+                        : "Approve"
+                      : ""}
                     </td>
-                  </tr>
-                ))}
+                  </tr>                ))}
               </tbody>
             </table>
             <div className="flex justify-center items-center gap-2">
