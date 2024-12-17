@@ -3,30 +3,38 @@ import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
+import { Navigate,useNavigate } from "react-router-dom";
 function VendorRegistration() {
   const [isLoading, setIsLoading] = useState(false);
   const [categoryData, setCategoryData] = useState([]);
+  const [selectedOption , setSelectionOption] = useState();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
   } = useForm();
-
+ const navigate = useNavigate();
   const Submit = async (formData) => {
-    console.log(formData);
+    console.log(typeof formData.revenue);
+    // if(typeof formData.revenue === "string"){
+    //   return alert("Please Enter The Correct Revenue");
+    // }
     setIsLoading(true);
     try {
       console.log("Form Data Submitted: ", formData);
+      formData.category = selectedOption;
       const response = await axios.post(
         "https://rfpdemo.velsof.com/api/registervendor",
-        formData
+        formData,
+        
       );
       console.log("Response from API:", response.data);
       if (response.data.response === "success") {
         toast.success(response.data.response);
-        <Navigate to={"/vendor/dashboard"} />
+        navigate("/user/login");
       } else {
         toast.error(response.data.error[0]);
       }
@@ -35,6 +43,11 @@ function VendorRegistration() {
     } catch (error) {
       toast.error("Registration Failed", error);
     }
+  };
+   const handleSelectedOption = (e) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+    setSelectionOption(selectedOptions.toString());
+    console.log("Selected Options:", selectedOptions.toString());
   };
   const fetchCategories = async () => {
     try {
@@ -54,7 +67,7 @@ function VendorRegistration() {
       setCategoryData([]);
     }
   };
-
+  //  const revenue = watch("revenue"); 
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -83,14 +96,18 @@ function VendorRegistration() {
               <input
                 {...register("firstname", {
                   required: "First Name is required",
+                  pattern: {
+                    value: /^[A-Za-z]+$/,
+                    message: "First Name should only contain letters",
+                  },
                 })}
                 type="text"
                 placeholder="First Name"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.firstName && (
+              {errors.firstname && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.firstName.message}
+                  {errors.firstname.message}
                 </p>
               )}
             </div>
@@ -99,14 +116,22 @@ function VendorRegistration() {
                 Last Name
               </label>
               <input
-                {...register("lastname", { required: "Last Name is required" })}
+                {...register("lastname", 
+                 { 
+                required: "Last Name is required",
+               pattern: {
+                    value: /^[A-Za-z]+$/,
+                    message: "Last Name should only contain letters",
+                  },
+                }
+              )}
                 type="text"
                 placeholder="Last Name"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.lastName && (
+              {errors.lastname && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.lastName.message}
+                  {errors.lastname.message}
                 </p>
               )}
             </div>
@@ -136,18 +161,37 @@ function VendorRegistration() {
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Password
               </label>
-              <input
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                })}
-                type="password"
-                placeholder="Password"
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="relative">
+                <input
+                  {...register("password", {
+                    required: "Password is required",
+                    pattern: {
+                        value: /^(?=.*[!@#$%^&*])(?=.*[a-zA-Z0-9]).{8,}$/,
+                        message:
+                          "Password must be at least 8 characters with at least one special character and alphanumeric characters.",
+                      },
+                  })}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}
@@ -158,39 +202,65 @@ function VendorRegistration() {
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Confirm Password
               </label>
-              <input
-                {...register("confirmPassword", {
-                  required: "Confirm Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Confirm Password must be at least 6 characters",
-                  },
-                  validate: (value) =>
-                    value === password || "Passwords do not match",
-                })}
-                type="password"
-                placeholder="Confirm Password"
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="relative">
+                <input
+                  {...register("confirmPassword", {
+                    required: "Confirm Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Confirm Password must be at least 6 characters",
+                    },
+                    validate: (value) =>
+                      value === password || "Passwords do not match",
+                  })}
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.confirmPassword.message}
                 </p>
               )}
-            </div>
-            <div className="col-span-1">
+            </div>            <div className="col-span-1">
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 Revenue
               </label>
               <input
-                {...register("revenue", { required: "Revenue is required" })}
+                {...register("revenue", 
+                { 
+                  required: "Revenue is required",
+                  pattern : {
+                    value : /^\d+(,\d+){2,}$/i,
+                    message : "Please Enter The Last Three Revenue Seperated By Commas"
+
+                  }
+                   }
+                )}
                 type="text"
                 placeholder="Revenue"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.revenue && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.revenue.message}
+                  {errors.revenue?.message}
                 </p>
               )}
             </div>
@@ -201,14 +271,19 @@ function VendorRegistration() {
               <input
                 {...register("no_of_employees", {
                   required: "Number of Employees is required",
-                })}
+                  pattern : {
+                    value : /^[0-9]+$/i,
+                    message : "Please Enter valid Number Of Employees"
+                }
+                }
+                )}
                 type="text"
                 placeholder="Number of Employees"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.noOfEmployees && (
+              {errors.no_of_employees && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.noOfEmployees.message}
+                  {errors.no_of_employees.message}
                 </p>
               )}
             </div>
@@ -217,14 +292,21 @@ function VendorRegistration() {
                 GST Number
               </label>
               <input
-                {...register("gst_no", { required: "GST Number is required" })}
+                {...register("gst_no", 
+                { 
+                  required: "GST Number is required",
+                  pattern : {
+                    value : /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d{1}Z[A-Z0-9]{1}$/,
+                    message : "Please Enter The Correct GST No"
+                  }
+                   })}
                 type="text"
                 placeholder="GST Number"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.gstNo && (
+              {errors.gst_no && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.gstNo.message}
+                  {errors.gst_no.message}
                 </p>
               )}
             </div>
@@ -235,14 +317,21 @@ function VendorRegistration() {
               <input
                 {...register("pancard_no", {
                   required: "PAN Number is required",
+                  pattern : {
+                    value : /^[A-Z]{5}\d{4}[A-Z]$/,
+                    message : "Please Enter Correct PAN No"
+                  }
                 })}
                 type="text"
                 placeholder="PAN Number"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onInput={(e) => {
+                  e.target.value = e.target.value.toUpperCase();
+                }}
               />
-              {errors.panNo && (
+              {errors.pancard_no && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.panNo.message}
+                  {errors.pancard_no.message}
                 </p>
               )}
             </div>
@@ -251,20 +340,20 @@ function VendorRegistration() {
                 Phone Number
               </label>
               <input
-                {...register("mobile", {
+                 {...register("mobile", {
                   required: "Phone Number is required",
                   pattern: {
-                    value: /^[0-9]{10}$/,
-                    message: "Invalid Phone Number",
+                    value: /^[1-9][0-9]{9}$/,
+                    message: "Invalid Phone Number,Enter 10 Digit Mobile Number without leading zero",
                   },
                 })}
                 type="text"
                 placeholder="Phone Number"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.phoneNo && (
+              {errors.mobile && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.phoneNo.message}
+                  {errors.mobile.message}
                 </p>
               )}
             </div>
@@ -276,8 +365,10 @@ function VendorRegistration() {
               <select
                 {...register("category", { required: "Category is required" })}
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                multiple
+                onChange={handleSelectedOption}
               >
-                <option value="">Select Category</option>
+                <option value="" disabled>Select Category</option>
                 {categoryData?.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}

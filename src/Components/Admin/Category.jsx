@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { setCategory } from "../Features/RPFslice";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
 
 function Category() {
   const [category, setLocalCategory] = useState([]);
@@ -13,11 +14,20 @@ function Category() {
   const [changedCategory, setChangedCategory] = useState();
   const [userInfo] = useState(JSON.parse(localStorage.getItem("userInfo")));
   const [addCategory, setAddCategory] = useState(false);
-  const [newCategory, setNewCategory] = useState("");
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [searchCategory, setSearchCategory] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
+  const [deletingId, setDeletingId] = useState(null);
+  const [changedCategoryLoading, setChangedCategoryLoading] = useState(false);
   const itemsPerPage = 10;
   const dispatch = useDispatch();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
 
   const getCategoryList = async () => {
     try {
@@ -47,7 +57,7 @@ function Category() {
 
   useEffect(() => {
     if (searchCategory) {
-      const filtered = category.filter(cat => 
+      const filtered = category.filter((cat) =>
         cat.name.toLowerCase().includes(searchCategory.toLowerCase())
       );
       setFilteredCategories(filtered);
@@ -62,12 +72,14 @@ function Category() {
 
   const currentItems = filteredCategories?.slice(first, last);
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
-
+  console.log(currentItems);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
   const handleDelete = async (id) => {
     try {
+      setDeleteLoading(true);
+      setDeletingId(id);
       const response = await axios.delete(
         `https://rfpdemo.velsof.com/api/categories/delete/${id}`,
         {
@@ -77,14 +89,26 @@ function Category() {
         }
       );
       console.log(response.data);
-      toast.success("Category Deleted Successfully");
-      getCategoryList();
+      if (response.data.response === "success") {
+        toast.success("Category Deleted Successfully");
+        getCategoryList();
+        setDeleteLoading(false);
+        setDeletingId(null);
+      } else {
+        toast.error(response.data.error || response.data.errors);
+        setDeleteLoading(false);
+        setDeletingId(null);
+      }
     } catch (error) {
       console.error(error);
+      toast.error("Error Deleting Category");
+      setDeleteLoading(false);
+      setDeletingId(null);
     }
   };
   const handleEditCategory = async () => {
     try {
+      setChangedCategoryLoading(true);
       const response = await axios.put(
         `https://rfpdemo.velsof.com/api/categories/${editInd}`,
         {
@@ -98,21 +122,29 @@ function Category() {
         }
       );
       console.log(response.data);
-      toast.success("Category Updated Successfully");
-      getCategoryList();
-      setEditInd(null);
-      setChangedCategory("");
+      if (response.data.response === "success") {
+        toast.success(response.data.response);
+        getCategoryList();
+        setEditInd(null);
+        setChangedCategory("");
+        setChangedCategoryLoading(false);
+      } else {
+        toast.error(response.data.error || response.data.errors);
+        setChangedCategoryLoading(false);
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Error Updating Category");
+      toast.error("Error Updating Category", error);
+      setChangedCategoryLoading(false);
     }
   };
-  const handleAddCategory = async () => {
+  const handleAddCategory = async (data) => {
     try {
+      setSubmitLoading(true);
       const response = await axios.post(
         "https://rfpdemo.velsof.com/api/categories",
         {
-          name: newCategory,
+          name: data.categoryName,
         },
         {
           headers: {
@@ -124,41 +156,62 @@ function Category() {
       if (response.data.response === "success") {
         toast.success(response.data.response);
         getCategoryList();
+        reset();
       } else {
-        toast.error(response.data.errors);
+        toast.error(response.data?.errors || response.data?.error);
+        setAddCategory(false);
       }
-      setAddCategory(false);
     } catch (error) {
       console.log("Error Occured In Add Category");
       toast.error(error);
+    } finally {
+      setSubmitLoading(false);
+      setAddCategory(false);
     }
   };
-
+  if (!userInfo?.token) {
+    return (
+      <div className="text-center text-xl font-semibold text-gray-600 p-4">
+        No Category List
+      </div>
+    );
+  }
   // Add Category
   if (addCategory) {
     return (
       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <input
-            type="text"
-            placeholder="Enter Category Name"
-            onChange={(e) => setNewCategory(e.target.value)}
-            className="border border-gray-300 rounded-md px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={handleAddCategory}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-            >
-              Submit
-            </button>
-            <button
-              onClick={() => setAddCategory(false)}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
+          <form onSubmit={handleSubmit(handleAddCategory)}>
+            <input
+              type="text"
+              placeholder="Enter Category Name"
+              {...register("categoryName", {
+                required: "Category name is required",
+              })}
+              className="border border-gray-300 rounded-md px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.categoryName && (
+              <p className="text-red-500 text-sm mb-2">
+                {errors.categoryName.message}
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                type="submit"
+                disabled={submitLoading}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors disabled:bg-blue-300"
+              >
+                {submitLoading ? "Submitting..." : "Submit"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setAddCategory(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     );
@@ -221,10 +274,12 @@ function Category() {
                       <td className="border border-gray-300 px-4 py-2">
                         <span
                           className={`px-2 py-1 text-white rounded ${
-                            item.status ? "bg-green-500" : "bg-red-500"
+                            item.status === "Active"
+                              ? "bg-green-500"
+                              : "bg-red-500"
                           }`}
                         >
-                          {item.status ? "Active" : "Inactive"}
+                          {item.status === "Active" ? "Active" : "Inactive"}
                         </span>
                       </td>
                       <td
@@ -251,7 +306,9 @@ function Category() {
                             className="w-full sm:w-auto bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded"
                             onClick={() => handleDelete(item.id)}
                           >
-                            Delete
+                            {deleteLoading && item.id === deletingId
+                              ? "Please Wait..."
+                              : "Delete"}
                           </button>
                         </div>
                       </td>{" "}
@@ -290,7 +347,13 @@ function Category() {
             className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
             onClick={() => handleEditCategory()}
           >
-            Change Category
+            {changedCategoryLoading ? "Please Wait" : "Change Category"}
+          </button>
+          <button
+            className="w-full sm:w-auto px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-200"
+            onClick={() => setEditInd(null)}
+          >
+            Cancel
           </button>
         </div>
       )}
