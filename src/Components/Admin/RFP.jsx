@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import CreateRFP from "./CreateRFP";
 import SelectCategory from "./SelectCategory";
+import RFPQuotes from "./RFPQuotes";
 
 function RFP() {
   const [userData] = useState(JSON.parse(localStorage.getItem("userInfo")));
@@ -10,7 +11,8 @@ function RFP() {
   const [RFPData, setRFPData] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [createRFP, setCreateRFP] = useState(false);
-  const [newRFPData , setNewRFPData] = useState('')
+  const [newRFPData , setNewRFPData] = useState('');
+  const [rfpquote , setRFPQuote] = useState(false);
   const itemsPerPage = 8;
  console.log(RFPData);
   async function getRFP() {
@@ -66,11 +68,15 @@ function RFP() {
             toast.error(error);
         }
   }
-
   useEffect(() => {
     getRFP();
-  }, []);
+  }, [createRFP]);
 
+   if(rfpquote){
+     return <RFPQuotes setRFPQuote={setRFPQuote} rfpquote={rfpquote}/>
+   }
+
+  
   const last = currentPage * itemsPerPage;
   const first = last - itemsPerPage;
   const currentRFP = RFPData?.slice(first, last);
@@ -138,17 +144,14 @@ function RFP() {
                         {RFPitem.status}
                       </td>
                       <td className="border border-gray-300 p-2">
-                        {RFPitem.status === "applied" ? (
-                          ""
-                        ) : RFPitem.status === "open" ? (
-                          <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2" onClick={()=>handleCloseRFP(RFPitem?.id)}>
-                            close
-                          </button>
-                        ) : (
-                          <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2">
-                            Quote
-                          </button>
-                        )}
+                        <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2" onClick={()=>handleCloseRFP(RFPitem?.id)}>
+                          close
+                        </button>
+                        <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        onClick={()=>setRFPQuote(RFPitem.rfp_id)}
+                        >
+                          Quote
+                        </button>
                       </td>{" "}
                     </tr>
                   ))}

@@ -153,6 +153,7 @@ function Category() {
         }
       );
       console.log(response.data);
+      
       if (response.data.response === "success") {
         toast.success(response.data.response);
         getCategoryList();
@@ -181,7 +182,21 @@ function Category() {
     return (
       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <form onSubmit={handleSubmit(handleAddCategory)}>
+          <form
+            onSubmit={handleSubmit(async (data) => {
+              const existingCategory = currentItems.find(
+                (item) =>
+                  item.name.toLowerCase() === data.categoryName.toLowerCase()
+              );
+              if (existingCategory) {
+                toast.error("Category already exists!");
+                reset();
+                setAddCategory(false);
+                return;
+              }
+              handleAddCategory(data);
+            })}
+          >
             <input
               type="text"
               placeholder="Enter Category Name"
@@ -205,7 +220,10 @@ function Category() {
               </button>
               <button
                 type="button"
-                onClick={() => setAddCategory(false)}
+                onClick={() => {
+                  reset();
+                  setAddCategory(false);
+                }}
                 className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
               >
                 Cancel
@@ -215,7 +233,7 @@ function Category() {
         </div>
       </div>
     );
-  }
+  }    
   // List Of All Category
   return (
     <div>
@@ -338,25 +356,40 @@ function Category() {
         <div className="flex flex-col sm:flex-row gap-4 p-4">
           <input
             type="text"
+            {...register("categoryName", {
+              required: "Category name is required",
+              minLength: {
+                value: 3,
+                message: "Category name must be at least 3 characters"
+              },
+              maxLength: {
+                value: 50,
+                message: "Category name must not exceed 50 characters"
+              }
+            })}
             value={changedCategory}
             placeholder="Enter New Category Name"
             className="w-full sm:w-2/3 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             onChange={(e) => setChangedCategory(e.target.value)}
           />
-          <button
-            className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
-            onClick={() => handleEditCategory()}
-          >
-            {changedCategoryLoading ? "Please Wait" : "Change Category"}
-          </button>
-          <button
-            className="w-full sm:w-auto px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-200"
-            onClick={() => setEditInd(null)}
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {errors.categoryName && (
+              <span className="text-red-500 text-sm">{errors.categoryName.message}</span>
+            )}
+            <button
+              className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+              onClick={handleSubmit(handleEditCategory)}
+            >
+              {changedCategoryLoading ? "Please Wait" : "Change Category"}
+            </button>
+            <button
+              className="w-full sm:w-auto px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-200"
+              onClick={() => setEditInd(null)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>      )}
     </div>
   );
 }

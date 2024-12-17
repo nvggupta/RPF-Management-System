@@ -68,7 +68,7 @@ function Sidebar() {
                   Category
                 </li>
               </Link>
-              <Link to={"/admin/rfp-for-quotes"}>
+              {/* <Link to={"/admin/rfp-for-quotes"}>
                 <li
                   className={`px-4 py-2 rounded cursor-pointer ${
                     activeItem === 4
@@ -77,9 +77,9 @@ function Sidebar() {
                   }`}
                   onClick={() => handleItemClick(4)}
                 >
-                  RFP Quotess
+                  
                 </li>
-              </Link>
+              </Link> */}
             </>
           )}
           {userType === "vendor" && (

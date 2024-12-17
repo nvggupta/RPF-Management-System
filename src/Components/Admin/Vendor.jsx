@@ -66,9 +66,17 @@ function Vendor() {
         }
       );
       console.log(response.data)
+      if (response.data.response === "success") {
+
       toast.success("Vendor approved successfully");
       setAppproveLoading(prev => ({...prev, [id]: false}));
       getVendorList();
+      }
+      else {
+        typeof error === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.errors || response.data.message);
+        setAppproveLoading(prev => ({...prev, [id]: false}));
+      }
+    
     } catch (error) {
       toast.error("Error approving vendor");
       console.log(error);

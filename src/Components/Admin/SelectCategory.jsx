@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import CreateRFP from "./CreateRFP";
 import axiosInstance from "../utills/Apihook";
 function SelectCategory({ totalRFP , setCreateRFP }) {
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const [Categories, setCategories] = useState([]);
   const [newRFP, setNewRFP] = useState(false);
   console.log(Categories);
 
   const handleCancel = () => {
-    setSelectedCategories([]);
+    setSelectedCategory("");
     setCreateRFP(false);
   };
 
@@ -34,25 +33,24 @@ function SelectCategory({ totalRFP , setCreateRFP }) {
 
 
   const handleCategoryChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-    setSelectedCategories(selectedOptions);
+    setSelectedCategory(e.target.value);
   };
 
-  console.log(selectedCategories);
+  console.log(selectedCategory);
   return (
     <div>
       {!newRFP ? (
         <div className="p-4">
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Select Categories
+              Select Category
             </label>
             <select
               className="shadow border rounded w-full py-2 px-3 text-gray-700"
-              value={selectedCategories}
+              value={selectedCategory}
               onChange={handleCategoryChange}
-              multiple
             >
+              <option value="">Select a category</option>
               {Categories?.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -76,7 +74,7 @@ function SelectCategory({ totalRFP , setCreateRFP }) {
           </div>
         </div>
       ) : (
-        <CreateRFP totalRFP={totalRFP} setCreateRFP={setCreateRFP} setNewRFP={setNewRFP} selectedCategories={selectedCategories} />
+        <CreateRFP totalRFP={totalRFP} setCreateRFP={setCreateRFP} setNewRFP={setNewRFP} selectedCategories={[selectedCategory]} />
       )}
     </div>
   );

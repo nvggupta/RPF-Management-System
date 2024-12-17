@@ -9,12 +9,16 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
   const [newRFPData, setNewRFPData] = useState();
   const [vendors, setVendors] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState("");
+  const [loading , setLoading] = useState(false);
   console.log("selectedCategory", selectedCategories);
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm();
+
+  const maximumPrice = watch("maximum_price");
 
   const onSubmit = async (data) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -27,7 +31,9 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
     };
     
     try {
+      setLoading(true);
       const response = await axios.post(
+
         "https://rfpdemo.velsof.com/api/createrfp",
         formData,
         {
@@ -41,19 +47,22 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
         toast.success("RFP Created successfully");
         setNewRFP(false);
         setCreateRFP(false);
+        setLoading(false);
       } else {
         toast.error(response.data.response);
+        setLoading(false);
       }
     } catch (error) {
       toast.error("Error Creating RFP");
       console.log(error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     (async () => {
       try {
-        const vendorResponse = await axiosInstance.get("/vendorlist");
+        const vendorResponse = await axiosInstance.get(`/vendorlist/${selectedCategories[0]}`);
         console.log(vendorResponse.data.vendors);
         setVendors(vendorResponse.data.vendors || []);
       } catch (error) {
@@ -138,8 +147,17 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
             <input
               type="date"
               id="last_date"
+              min={new Date().toISOString().split('T')[0]}
               className="border rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
-              {...register("last_date", { required: "Last Date is required" })}
+              {...register("last_date", { 
+                required: "Last Date is required",
+                validate: (value) => {
+                  const selectedDate = new Date(value)
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+                  return selectedDate >= today || "Please select a future date"
+                }
+              })}
             />
             {errors.last_date && (
               <span className="text-red-500 text-sm">
@@ -178,8 +196,10 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
             id="minimum_price"
             className="border rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
             {...register("minimum_price", {
-              required: "Maximum Price is required",
+              required: "Minimum Price is required",
               valueAsNumber: true,
+              validate: (value) => 
+                !maximumPrice || value <= maximumPrice || "Minimum price cannot be greater than maximum price"
             })}
           />
           {errors.minimum_price && (
