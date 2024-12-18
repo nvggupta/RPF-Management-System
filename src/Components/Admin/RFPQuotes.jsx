@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../utills/Apihook';
+import { toast } from 'react-toastify';
 
 function RFPQuotes({ setRFPQuote, rfpquote }) {
   const [rfpQuotes, setRFPQuotes] = useState([]);
@@ -14,12 +15,21 @@ function RFPQuotes({ setRFPQuote, rfpquote }) {
       setLoading(true);
       const response = await axiosInstance.get(`/rfp/quotes/${rfpquote}`);
       console.log(response.data);
-      setRFPQuotes(response.data.quotes); 
-      setTotalItems(response.data.totalItems); 
-      setLoading(false);
+      if(response.data.response === "success"){
+
+        setRFPQuotes(response.data.quotes); 
+        setTotalItems(response.data.totalItems); 
+        setLoading(false);
+      }
+      else{
+        typeof response.data.errors === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.error || response.data.errors || response.data.message);
+        setLoading(false);
+      }
     } catch (error) {
       console.log(error);
       setLoading(false);
+      toast.error(error);
+      
     }
   };
 

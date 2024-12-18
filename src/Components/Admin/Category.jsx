@@ -129,7 +129,7 @@ function Category() {
         setChangedCategory("");
         setChangedCategoryLoading(false);
       } else {
-        toast.error(response.data.error || response.data.errors);
+        typeof response.data.errors === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.error || response.data.errors || response.data.message);
         setChangedCategoryLoading(false);
       }
     } catch (error) {

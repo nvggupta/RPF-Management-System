@@ -64,7 +64,7 @@ function RFP() {
                 toast.success(response.data.response);
             }
             else{
-                toast.error(response.data.response);
+              typeof response.data.errors === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.error || response.data.errors || response.data.message);
             }
         } catch (error) {
             console.log("Error Occured To Close The RFP")

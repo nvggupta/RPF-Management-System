@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CreateRFP from "./CreateRFP";
 import axiosInstance from "../utills/Apihook";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 function SelectCategory({ totalRFP , setCreateRFP }) {
   const { register, handleSubmit, formState: { errors }, setValue } = useForm();
@@ -26,10 +27,16 @@ function SelectCategory({ totalRFP , setCreateRFP }) {
       try {
         const response = await axiosInstance.get("/categories");
         console.log(response.data.categories);
-        setCategories(Object.values(response.data.categories) || []);
+        if(response.data.response === "success"){
+          setCategories(Object.values(response.data.categories) || []);
+        }
+        else{
+          typeof response.data.errors === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.error || response.data.errors || response.data.message);
+        }
       } catch (error) {
         console.error("Failed to fetch vendors:", error);
         setCategories([]);
+        toast.error("Error Occured In Fetching Category");
       }
     })();
   }, []);
