@@ -54,7 +54,6 @@ function SelectCategory({ totalRFP , setCreateRFP }) {
               <select
                 className="shadow border rounded w-full py-2 px-3 text-gray-700"
                 {...register("category", { required: "Please select a category" })}
-                disabled={true}
               >
                 <option value="">Select a category</option>
                 {Categories?.map((category) => (
