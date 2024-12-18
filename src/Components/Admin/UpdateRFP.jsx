@@ -4,56 +4,65 @@ import { useForm } from "react-hook-form";
 import axiosInstance from "../utills/Apihook";
 import { ToastContainer, toast } from "react-toastify";
 
-import { useSelector } from "react-redux";
-function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
-  const [newRFPData, setNewRFPData] = useState();
+function UpdateRFP({ rfpData, setUpdateRFPData, selectedCategory, setNewRFP }) {
   const [vendors, setVendors] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState("");
-  const [loading , setLoading] = useState(false);
-  console.log("selectedCategory", selectedCategories);
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      rfp_no: rfpData?.rfp_no || "",
+      item_name: rfpData?.item_name || "",
+      quantity: rfpData?.quantity || "",
+      last_date: rfpData?.last_date || "",
+      maximum_price: rfpData?.maximum_price || "",
+      minimum_price: rfpData?.minimum_price || "",
+      item_description: rfpData?.item_description || "",
+    },
+  });
 
   const maximumPrice = watch("maximum_price");
 
   const onSubmit = async (data) => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    console.log("Create RFP Data", data);
+    console.log("Update RFP Data", data);
     const formData = {
       ...data,
-      user_id: totalRFP+1,
-      categories: selectedCategories?.join(","),
+      user_id: rfpData?.user_id,
+      categories: selectedCategory,
       vendors: data.vendors?.join(","),
     };
-    
+
     try {
       setLoading(true);
-      const response = await axios.post(
-
-        "https://rfpdemo.velsof.com/api/createrfp",
-        formData,
+      const response = await axios.put(
+        `https://rfpdemo.velsof.com/api/rfp/${rfpData?.rfp_id}`,
+        { ...formData, _method: "put" },
         {
           headers: {
             Authorization: `Bearer ${userInfo?.token}`,
           },
         }
       );
-      console.log(response.data);
       if (response.data.response === "success") {
-        toast.success("RFP Created successfully");
+        toast.success(response.data.response);
         setNewRFP(false);
-        setCreateRFP(false);
         setLoading(false);
+        setUpdateRFPData(false);
       } else {
-        toast.error(response.data.response);
+        toast.error(
+          response.data.error || response.data.errors || response.data.message
+        );
         setLoading(false);
       }
     } catch (error) {
-      toast.error("Error Creating RFP");
+      toast.error("Error Updating RFP");
       console.log(error);
       setLoading(false);
     }
@@ -62,25 +71,29 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
   useEffect(() => {
     (async () => {
       try {
-        const vendorResponse = await axiosInstance.get(`/vendorlist/${selectedCategories[0]}`);
-        console.log(vendorResponse.data.vendors);
+        const vendorResponse = await axiosInstance.get(
+          `/vendorlist/${selectedCategory}`
+        );
         setVendors(vendorResponse.data.vendors || []);
       } catch (error) {
         console.error("Failed to fetch vendors:", error);
         setVendors([]);
       }
     })();
-  }, []);
+  }, [selectedCategory]);
 
   const handleVendorChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
-    console.log("Selected vendor IDs:", selectedOptions);
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
     setSelectedVendor(selectedOptions);
   };
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md">
-    <ToastContainer />
-      <h1 className="text-2xl font-bold mb-6">Create RFP</h1>
+      <ToastContainer />
+      <h1 className="text-2xl font-bold mb-6">Update RFP</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* RFP Number */}
@@ -148,16 +161,16 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
             <input
               type="date"
               id="last_date"
-              min={new Date().toISOString().split('T')[0]}
+              min={new Date().toISOString().split("T")[0]}
               className="border rounded-md p-2 focus:outline-none focus:ring focus:ring-blue-300"
-              {...register("last_date", { 
+              {...register("last_date", {
                 required: "Last Date is required",
                 validate: (value) => {
-                  const selectedDate = new Date(value)
-                  const today = new Date()
-                  today.setHours(0, 0, 0, 0)
-                  return selectedDate >= today || "Please select a future date"
-                }
+                  const selectedDate = new Date(value);
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  return selectedDate >= today || "Please select a future date";
+                },
               })}
             />
             {errors.last_date && (
@@ -199,8 +212,10 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
             {...register("minimum_price", {
               required: "Minimum Price is required",
               valueAsNumber: true,
-              validate: (value) => 
-                !maximumPrice || value <= maximumPrice || "Minimum price cannot be greater than maximum price"
+              validate: (value) =>
+                !maximumPrice ||
+                value <= maximumPrice ||
+                "Minimum price cannot be greater than maximum price",
             })}
           />
           {errors.minimum_price && (
@@ -274,7 +289,7 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
             type="submit"
             className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
           >
-            {loading ? "Please Wait..." : "Create RFP"}
+            {loading ? "Please Wait..." : "Update RFP"}
           </button>
         </div>
       </form>
@@ -282,4 +297,4 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
   );
 }
 
-export default CreateRFP;
+export default UpdateRFP;

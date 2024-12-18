@@ -24,20 +24,21 @@ function RFPForQuotes() {
       setQuotesData(response.data.rfps);
     } catch (error) {
       console.log(error);
-      toast.error("Error Occured");
+      toast.error("Error Occured",error);
     }
   };
 
   useEffect(() => {
     getAdminQuotes();
-  }, []);
+  }, [selectedQuote]);
 
   const isDateValid = (lastDate) => {
     const today = new Date();
     const rfpDate = new Date(lastDate);
     return rfpDate > today;
   };
-
+  console.log("quotesData", quotesData);
+  const handleVendorQuotes = ()=>{};
   return (
     <div className="p-6">
       <ToastContainer />
@@ -97,12 +98,12 @@ function RFPForQuotes() {
                       quote.status === "open" ? (
                         <button
                           className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                          onClick={() => setSelectedQuote(quotesData.rfp_id)}
+                          onClick={() => setSelectedQuote(quote.rfp_id)}
                         >
                           Apply
                         </button>
                       ) : (
-                        <span className="text-red-500">Closed</span>
+                        <button className="text-red-500" onClick={handleVendorQuotes}>Quotes</button>
                       )}
                     </td>
                   </tr>

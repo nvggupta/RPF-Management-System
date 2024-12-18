@@ -2,10 +2,12 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import  { useState } from "react";
 
 function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
-  const { register, handleSubmit, reset, watch, setValue } = useForm();
-
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
+  const [loading, setLoading] = useState(false);
+  console.log("selectedQuote", selectedQuote);
   const calculateTotalCost = () => {
     const item_price = parseFloat(watch("item_price")) || 0;
     const quantity = parseInt(watch("quantity")) || 0;
@@ -18,7 +20,8 @@ function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
     console.log(data);
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     try {
-      const response = await axios.post(
+      setLoading(true);
+      const response = await axios.put(
         `https://rfpdemo.velsof.com/api/rfp/apply/${selectedQuote}`,
         {
           ...data,
@@ -31,12 +34,21 @@ function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
         }
       );
       console.log(response.data);
-      toast.success("Quote applied successfully!");
-      reset();
-      setSelectedQuote(null);
+      if (response.data.response === "success") {
+        toast.success(response.data.response);
+        reset();
+        setSelectedQuote(null);
+        setLoading(false);
+      }
+      else{
+        typeof response.data.error === "object" ? toast.error(response.data.errors[0]) :  toast.error(response.data.error || response.data.errors || response.data.message);
+        reset();
+          setLoading(false);
+      }
     } catch (error) {
       console.log(error);
       toast.error("Error Occured");
+      reset();  
     }
   };
   const onCancel = () => {
@@ -58,21 +70,25 @@ function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
             <input
               type="number"
               {...register("item_price", {
-                required: true,
+                required: "Vendor price is required",
                 onChange: calculateTotalCost,
               })}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter vendor price"
             />
+            {errors.item_price && <p className="text-red-500 text-sm mt-1">{errors.item_price.message}</p>}
           </div>
 
           <div>
             <label className="block text-gray-700">Item Description</label>
             <textarea
-              {...register("itemDescription", { required: true })}
+              {...register("itemDescription", { 
+                required: "Item description is required" 
+              })}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter item description"
             ></textarea>
+            {errors.itemDescription && <p className="text-red-500 text-sm mt-1">{errors.itemDescription.message}</p>}
           </div>
 
           <div>
@@ -80,23 +96,27 @@ function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
             <input
               type="number"
               {...register("quantity", {
-                required: true,
+                required: "Quantity is required",
                 onChange: calculateTotalCost,
               })}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter quantity"
             />
+            {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity.message}</p>}
           </div>
 
           <div>
             <label className="block text-gray-700">Total Cost</label>
             <input
               type="number"
-              {...register("total_cost", { required: true })}
+              {...register("total_cost", { 
+                required: "Total cost is required" 
+              })}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter total cost"
               readOnly
             />
+            {errors.total_cost && <p className="text-red-500 text-sm mt-1">{errors.total_cost.message}</p>}
           </div>
         </div>
 
@@ -105,7 +125,7 @@ function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
             type="submit"
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none"
           >
-            Submit
+            {loading ? "Please Wait..." : "Submit"}
           </button>
           <button
             type="button"
@@ -119,5 +139,6 @@ function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
     </div>
   );
 }
+
 
 export default ApplyForQuotes;
