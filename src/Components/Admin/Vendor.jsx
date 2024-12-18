@@ -68,12 +68,12 @@ function Vendor() {
       console.log(response.data)
       if (response.data.response === "success") {
 
-      toast.success("Vendor approved successfully");
+      toast.success(response.data.response);
       setAppproveLoading(prev => ({...prev, [id]: false}));
       getVendorList();
       }
       else {
-        typeof error === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.errors || response.data.message);
+        typeof error === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.errors || response.data.message || response.data.error);
         setAppproveLoading(prev => ({...prev, [id]: false}));
       }
     

@@ -37,7 +37,6 @@ function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
       if (response.data.response === "success") {
         toast.success(response.data.response);
         reset();
-        setSelectedQuote(null);
         setLoading(false);
       }
       else{
@@ -83,7 +82,11 @@ function ApplyForQuotes({ selectedQuote, setSelectedQuote }) {
             <label className="block text-gray-700">Item Description</label>
             <textarea
               {...register("itemDescription", { 
-                required: "Item description is required" 
+                required: "Item description is required" ,
+                minLength:{
+                  value : 8,
+                  message: "Please Enter Atleast 8 Character Message"
+                }
               })}
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter item description"

@@ -15,6 +15,7 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm();
 
@@ -44,17 +45,19 @@ function CreateRFP({ totalRFP,setNewRFP,setCreateRFP, selectedCategories }) {
       );
       console.log(response.data);
       if (response.data.response === "success") {
-        toast.success("RFP Created successfully");
-        setNewRFP(false);
-        setCreateRFP(false);
+        toast.success(response.data.response);
+        reset();
+        // setNewRFP(false);
+        // setCreateRFP(false);
         setLoading(false);
       } else {
-        toast.error(response.data.response);
+        typeof response.data.errors === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.error || response.data.errors || response.data.message);
         setLoading(false);
       }
     } catch (error) {
       toast.error("Error Creating RFP");
       console.log(error);
+      reset();
       setLoading(false);
     }
   };

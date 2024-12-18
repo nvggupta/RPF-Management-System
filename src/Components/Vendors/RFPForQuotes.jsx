@@ -94,14 +94,15 @@ function RFPForQuotes() {
                       {quote.status}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {isDateValid(quote.last_date) &&
-                      quote.status === "open" ? (
-                        <button
-                          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                          onClick={() => setSelectedQuote(quote.rfp_id)}
-                        >
-                          Apply
-                        </button>
+                      {isDateValid(quote.last_date) ? (
+                        quote.status === "open" && (
+                          <button
+                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                            onClick={() => setSelectedQuote(quote.rfp_id)}
+                          >
+                            Apply
+                          </button>
+                        )
                       ) : (
                         <button className="text-red-500" onClick={handleVendorQuotes}>Quotes</button>
                       )}

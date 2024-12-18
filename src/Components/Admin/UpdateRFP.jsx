@@ -52,13 +52,11 @@ function UpdateRFP({ rfpData, setUpdateRFPData, selectedCategory, setNewRFP }) {
       );
       if (response.data.response === "success") {
         toast.success(response.data.response);
-        setNewRFP(false);
+        // setNewRFP(false);
         setLoading(false);
-        setUpdateRFPData(false);
+        // setUpdateRFPData(false);
       } else {
-        toast.error(
-          response.data.error || response.data.errors || response.data.message
-        );
+        typeof response.data.errors === "object" ? toast.error(response.data.errors[0]) : toast.error(response.data.errors || response.data.message || response.data.error);
         setLoading(false);
       }
     } catch (error) {
