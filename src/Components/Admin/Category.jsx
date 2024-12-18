@@ -181,6 +181,7 @@ function Category() {
   if (addCategory) {
     return (
       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+      <ToastContainer  />
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <form
             onSubmit={handleSubmit(async (data) => {
@@ -334,7 +335,7 @@ function Category() {
                   ))}
                 </tbody>
               </table>
-              <div className="mt-4 flex justify-center">
+              <div className="mt-2 flex justify-center">
                 {Array.from({ length: totalPages }, (_, index) => (
                   <button
                     key={index}
@@ -354,6 +355,7 @@ function Category() {
         </div>
       ) : (
         <div className="flex flex-col sm:flex-row gap-4 p-4">
+          <ToastContainer />
           <input
             type="text"
             {...register("categoryName", {

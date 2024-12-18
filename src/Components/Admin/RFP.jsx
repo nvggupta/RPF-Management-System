@@ -16,6 +16,7 @@ function RFP() {
   const [newRFPData , setNewRFPData] = useState('');
   const [rfpquote , setRFPQuote] = useState(false);
   const [updateRFPData, setUpdateRFPData] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 8;
  console.log(RFPData);
   async function getRFP() {
@@ -87,10 +88,16 @@ function RFP() {
     setUpdateRFPData(rfpItem);
   }
   
+  const filteredRFP = RFPData?.filter((item) =>
+    item.item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.id.toString().includes(searchTerm) ||
+    item.status.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const last = currentPage * itemsPerPage;
   const first = last - itemsPerPage;
-  const currentRFP = RFPData?.slice(first, last);
-  const totalPages = Math.ceil(RFPData?.length / itemsPerPage);
+  const currentRFP = filteredRFP?.slice(first, last);
+  const totalPages = Math.ceil(filteredRFP?.length / itemsPerPage);
 
   return (
     <div>
@@ -99,15 +106,24 @@ function RFP() {
           <ToastContainer />
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">RFP List</h1>
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
-            onClick={()=>setCreateRFP(true)}
-            >
-              ADD RFP
-            </button>
+            <div className="flex gap-4">
+              <input
+                type="text"
+                placeholder="Search RFP..."
+                className="px-4 py-2 border rounded-md"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
+              onClick={()=>setCreateRFP(true)}
+              >
+                ADD RFP
+              </button>
+            </div>
           </div>
           {isLoading ? (
             <p className="text-blue-500">Loading...</p>
-          ) : RFPData?.length > 0 ? (
+          ) : filteredRFP?.length > 0 ? (
             <>
               <table className="w-full border-collapse border border-gray-300 mb-4">
                 <thead>
