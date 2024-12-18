@@ -58,13 +58,14 @@ function UpdateCategory({ rfpData, setUpdateRFPData }) {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">
-                Select Category
+                Selected Category<span className="font[200] text-gray-400">(You Can not Change The Category)</span>
               </label>
               <select
                 className="shadow border rounded w-full py-2 px-3 text-gray-700"
                 {...register("category", { required: "Category is required" })}
+                value={selectedCategory}
               >
-                <option value="">Select a category</option>
+                <option value="" disabled>Select a category</option>
                 {Categories?.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}

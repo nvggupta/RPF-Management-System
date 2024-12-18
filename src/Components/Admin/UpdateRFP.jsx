@@ -8,7 +8,7 @@ function UpdateRFP({ rfpData, setUpdateRFPData, selectedCategory, setNewRFP }) {
   const [vendors, setVendors] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState("");
   const [loading, setLoading] = useState(false);
-
+   console.log(selectedCategory)
   const {
     register,
     handleSubmit,
@@ -73,6 +73,7 @@ function UpdateRFP({ rfpData, setUpdateRFPData, selectedCategory, setNewRFP }) {
           `/vendorlist/${selectedCategory}`
         );
         setVendors(vendorResponse.data.vendors || []);
+        console.log(vendorResponse)
       } catch (error) {
         console.error("Failed to fetch vendors:", error);
         setVendors([]);
@@ -223,7 +224,7 @@ function UpdateRFP({ rfpData, setUpdateRFPData, selectedCategory, setNewRFP }) {
           )}
         </div>
 
-        {/* Item Description - Full Width */}
+  
         <div className="flex flex-col">
           <label htmlFor="itemDescription" className="font-medium mb-1">
             Item Description
@@ -243,7 +244,6 @@ function UpdateRFP({ rfpData, setUpdateRFPData, selectedCategory, setNewRFP }) {
           )}
         </div>
 
-        {/* Vendors List - Multiple Selection */}
         <div className="flex flex-col">
           <label htmlFor="vendors" className="font-medium mb-1">
             Select vendors

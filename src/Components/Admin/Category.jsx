@@ -27,6 +27,7 @@ function Category() {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm();
 
   const getCategoryList = async () => {
@@ -109,6 +110,7 @@ function Category() {
   const handleEditCategory = async () => {
     try {
       setChangedCategoryLoading(true);
+  
       const response = await axios.put(
         `https://rfpdemo.velsof.com/api/categories/${editInd}`,
         {
@@ -315,8 +317,9 @@ function Category() {
                           <button
                             className="w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded"
                             onClick={() => {
-                              setEditInd(item.id),
-                                setChangedCategory(item.name);
+                              setEditInd(item.id);
+                              setChangedCategory(item.name);
+                              setValue("categoryName", item.name);
                             }}
                           >
                             Edit
@@ -369,7 +372,7 @@ function Category() {
                 message: "Category name must not exceed 50 characters"
               }
             })}
-            value={changedCategory}
+            defaultValue={changedCategory}
             placeholder="Enter New Category Name"
             className="w-full sm:w-2/3 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             onChange={(e) => setChangedCategory(e.target.value)}

@@ -7,15 +7,13 @@ function Header() {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // const { register, handleSubmit, formState: { errors }, reset , watch } = useForm();
-
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       setIsLoggedIn(true);
       setUserData(JSON.parse(userInfo));
     }
-  },[]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("userInfo");
@@ -23,16 +21,6 @@ function Header() {
     setUserData(null);
     setShowResetPassword(false);
   };
-
-  // const onSubmit = (data) => {
-  //   if (data.newPassword !== data.confirmPassword) {
-  //     alert("Passwords do not match!");
-  //     return;
-  //   }
-  //   console.log(data);
-  //   setShowResetPassword(false);
-  //   reset();
-  // };
 
   return (
     <div className="w-full bg-white shadow-md">
@@ -42,7 +30,7 @@ function Header() {
         </h3>
         <div className="flex items-center gap-4">
           <div className="relative">
-            <span 
+            <span
               className="text-gray-600 cursor-pointer p-4 "
               onMouseEnter={() => setShowDropdown(true)}
               onMouseLeave={() => setShowDropdown(false)}
@@ -71,9 +59,7 @@ function Header() {
             </Link>
           ) : (
             <Link to="/user/login">
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              >
+              <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
                 Login
               </button>
             </Link>
@@ -81,12 +67,12 @@ function Header() {
         </div>
       </div>
       {showResetPassword && (
-        
-        <ResetPasswordAuthentication setShowResetPassword={setShowResetPassword}/>
-      )
-      }
+        <ResetPasswordAuthentication
+          setShowResetPassword={setShowResetPassword}
+        />
+      )}
     </div>
   );
-}     
+}
 
 export default Header;
